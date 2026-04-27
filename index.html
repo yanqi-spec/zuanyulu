@@ -28,7 +28,6 @@
             border-radius: 68px;
             box-shadow: 0 35px 55px rgba(0, 0, 0, 0.6);
             overflow: hidden;
-            border: 1px solid #e9dbbd;
         }
 
         .header {
@@ -44,17 +43,14 @@
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            letter-spacing: 3px;
         }
 
         .sub {
             color: #dfc799;
             font-size: 0.75rem;
             margin-top: 6px;
-            font-style: italic;
         }
 
-        /* 切换选择区 */
         .selector-area {
             display: flex;
             gap: 20px;
@@ -66,7 +62,7 @@
 
         .book-option {
             flex: 1;
-            min-width: 180px;
+            min-width: 160px;
             background: #f3ebdb;
             border-radius: 60px;
             padding: 10px 12px 10px 20px;
@@ -90,27 +86,21 @@
             align-items: center;
             gap: 10px;
             font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .book-label span:first-child {
-            font-size: 1.5rem;
+            font-size: 1rem;
         }
 
         .book-status {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             background: #d9cbaf;
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 50px;
             color: #4e3b24;
         }
 
-        /* 金句展板 */
         .quote-stage {
             background: linear-gradient(135deg, #342a1f, #241e15);
             margin: 20px 28px;
             border-radius: 48px;
-            box-shadow: inset 0 1px 4px rgba(0,0,0,0.4), 0 12px 24px rgba(0,0,0,0.3);
             padding: 30px 28px;
             min-height: 260px;
             display: flex;
@@ -119,20 +109,19 @@
         }
 
         .quote-text {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             line-height: 1.45;
             color: #fff3df;
             text-shadow: 2px 2px 5px #00000040;
-            font-weight: 500;
             text-align: center;
-            font-family: '华文楷书', '楷体', 'Georgia', serif;
+            font-family: '华文楷书', '楷体', serif;
             word-break: break-word;
         }
 
         .quote-meta {
             margin-top: 20px;
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #ddba7a;
             border-top: 1px dashed #cb9f5b60;
             padding-top: 16px;
@@ -145,7 +134,6 @@
             display: inline-block;
         }
 
-        /* 按钮组 */
         .action-buttons {
             display: flex;
             justify-content: center;
@@ -156,7 +144,7 @@
         .btn {
             border: none;
             background: #7a592f;
-            padding: 12px 28px;
+            padding: 12px 24px;
             border-radius: 80px;
             font-weight: bold;
             font-size: 1rem;
@@ -184,10 +172,6 @@
             background: #4d3b24;
         }
 
-        .btn-secondary:hover {
-            background: #6b522f;
-        }
-
         .status-bar {
             background: #e7ddca;
             margin: 0 28px 25px;
@@ -205,12 +189,6 @@
             color: #b69462;
             border-top: 1px solid #ecdcaa;
             background: #fff7ea;
-        }
-
-        @media (max-width: 550px) {
-            .quote-text { font-size: 1.2rem; }
-            .btn { padding: 8px 16px; font-size: 0.85rem; }
-            .selector-area { flex-direction: column; }
         }
     </style>
 </head>
@@ -254,29 +232,21 @@
         📁 正在加载 TXT 文件...
     </div>
     <footer>
-        💡 点击上方切换书籍 | 双击 HTML 直接运行，无需服务器
+        💡 点击上方切换书籍 | 需要 fire.txt 和 flower.txt 两个文件
     </footer>
 </div>
 
 <script>
-    // ============================================================
-    // 文件路径：HTML 文件同一目录下的两个 TXT 文件
-    // ============================================================
-    const LEFT_FILE = '骂人宝典-火力全开.txt';
-    const RIGHT_FILE = '骂人宝典-口吐芬芳.txt';
+    // 使用英文文件名，避免中文编码问题
+    const LEFT_FILE = 'fire.txt';
+    const RIGHT_FILE = 'flower.txt';
 
-    // 存储句子数组
     let leftSentences = [];
     let rightSentences = [];
-    
-    // 加载状态
     let leftLoaded = false;
     let rightLoaded = false;
-    
-    // 当前选中的书籍: 'left' 或 'right'
     let currentBook = 'left';
 
-    // DOM 元素
     const optionLeft = document.getElementById('optionLeft');
     const optionRight = document.getElementById('optionRight');
     const leftStatusSpan = document.getElementById('leftStatus');
@@ -312,44 +282,32 @@
         }
     }
 
-    // 从文本内容中提取句子（按标点符号分割）
     function extractSentences(text) {
-        // 按句号、感叹号、问号、分号、换行分割
         let sentences = text.split(/[。！？；\n\r]+/);
-        
-        // 清洗每个句子
         let result = [];
         for (let s of sentences) {
             s = s.trim().replace(/\s+/g, ' ');
-            // 过滤掉太短、太长、空、纯数字、无意义的行
             if (s.length > 4 && s.length < 200 && 
                 !/^\d+$/.test(s) &&
                 !s.includes('目录') &&
-                !s.includes('序言') &&
-                !s.includes('第一章') &&
-                !s.includes('第二章')) {
+                !s.includes('序言')) {
                 result.push(s);
             }
         }
-        
-        // 去重
         return [...new Set(result)];
     }
 
-    // 加载 TXT 文件
     async function loadTxtFile(url, side) {
         try {
             const response = await fetch(url);
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: 文件不存在`);
+                throw new Error(`文件不存在 (${response.status})`);
             }
             const text = await response.text();
             const sentences = extractSentences(text);
-            
             if (sentences.length === 0) {
                 throw new Error('未找到有效句子');
             }
-            
             return sentences;
         } catch (err) {
             console.error(`加载 ${url} 失败:`, err);
@@ -357,27 +315,22 @@
         }
     }
 
-    // 加载两本书
     async function loadBothBooks() {
         setStatus("⏳ 正在加载《火力全开》...");
         updateLeftStatus("⏳ 加载中");
         updateRightStatus("⏳ 待加载");
         
-        // 加载左边
         try {
             leftSentences = await loadTxtFile(LEFT_FILE, 'left');
             leftLoaded = true;
             updateLeftStatus(`✅ ${leftSentences.length} 句`);
-            setStatus(`✅ 《火力全开》加载完成 (${leftSentences.length} 句)，加载《口吐芬芳》...`);
+            setStatus(`✅ 《火力全开》加载完成，加载《口吐芬芳》...`);
         } catch (err) {
             leftLoaded = false;
-            leftSentences = [];
-            let errorMsg = err.message || '文件不存在';
-            updateLeftStatus(`❌ ${errorMsg}`, true);
-            setStatus(`⚠️ 火力全开加载失败: ${errorMsg}`, true);
+            updateLeftStatus(`❌ 文件不存在`, true);
+            setStatus(`⚠️ 请确保 ${LEFT_FILE} 文件存在`, true);
         }
         
-        // 加载右边
         try {
             rightSentences = await loadTxtFile(RIGHT_FILE, 'right');
             rightLoaded = true;
@@ -385,48 +338,37 @@
             setStatus(`📚 双书加载完成 | 左:${leftSentences.length}句 右:${rightSentences.length}句`);
         } catch (err) {
             rightLoaded = false;
-            rightSentences = [];
-            let errorMsg = err.message || '文件不存在';
-            updateRightStatus(`❌ ${errorMsg}`, true);
-            setStatus(`⚠️ 口吐芬芳加载失败: ${errorMsg}`, true);
+            updateRightStatus(`❌ 文件不存在`, true);
+            setStatus(`⚠️ 请确保 ${RIGHT_FILE} 文件存在`, true);
         }
         
-        // 加载完成后自动抽一句
         if ((currentBook === 'left' && leftLoaded) || (currentBook === 'right' && rightLoaded)) {
             getRandomQuote();
-        } else if (!leftLoaded && !rightLoaded) {
-            quoteTextDiv.innerHTML = '😓 未找到 TXT 文件\n请确保两个 txt 文件与 HTML 在同一目录';
-            sourceBadge.innerHTML = '📂 文件: 火力全开.txt / 口吐芬芳.txt';
         }
     }
 
-    // 随机抽取金句
     function getRandomQuote() {
         const isLeft = (currentBook === 'left');
         const sentences = isLeft ? leftSentences : rightSentences;
         const loaded = isLeft ? leftLoaded : rightLoaded;
-        const bookName = isLeft ? '《骂人宝典·火力全开》' : '《骂人宝典·口吐芬芳》';
+        const bookName = isLeft ? '《火力全开》' : '《口吐芬芳》';
         const icon = isLeft ? '🔥' : '🌸';
         
         if (!loaded || sentences.length === 0) {
-            quoteTextDiv.innerHTML = '⚠️ 当前宝典未加载成功，请检查 TXT 文件是否存在';
+            quoteTextDiv.innerHTML = `⚠️ 请确保 ${isLeft ? LEFT_FILE : RIGHT_FILE} 文件存在`;
             sourceBadge.innerHTML = `${icon} ${bookName} · 加载失败`;
             return;
         }
         
         const randomIndex = Math.floor(Math.random() * sentences.length);
-        const quote = sentences[randomIndex];
-        
-        quoteTextDiv.innerHTML = `「 ${quote} 」`;
-        sourceBadge.innerHTML = `${icon} ${bookName} · 第${randomIndex + 1}句`;
+        quoteTextDiv.innerHTML = `「 ${sentences[randomIndex]} 」`;
+        sourceBadge.innerHTML = `${icon} ${bookName} · 金句`;
     }
 
     async function retryLoad() {
-        setStatus("🔄 重新加载书籍...");
+        setStatus("🔄 重新加载...");
         leftLoaded = false;
         rightLoaded = false;
-        leftSentences = [];
-        rightSentences = [];
         updateLeftStatus("⏳ 重载中");
         updateRightStatus("⏳ 重载中");
         await loadBothBooks();
@@ -436,40 +378,21 @@
         if (currentBook === 'left') return;
         currentBook = 'left';
         highlightSelected();
-        if (leftLoaded) {
-            getRandomQuote();
-        } else {
-            quoteTextDiv.innerHTML = '📕 《火力全开》尚未加载，请点击「重新加载」';
-            sourceBadge.innerHTML = '🔥 等待加载';
-        }
+        getRandomQuote();
     }
 
     function switchToRight() {
         if (currentBook === 'right') return;
         currentBook = 'right';
         highlightSelected();
-        if (rightLoaded) {
-            getRandomQuote();
-        } else {
-            quoteTextDiv.innerHTML = '📘 《口吐芬芳》尚未加载，请点击「重新加载」';
-            sourceBadge.innerHTML = '🌸 等待加载';
-        }
+        getRandomQuote();
     }
 
-    // 绑定事件
     optionLeft.addEventListener('click', switchToLeft);
     optionRight.addEventListener('click', switchToRight);
-    randomBtn.addEventListener('click', () => {
-        if ((currentBook === 'left' && leftLoaded) || (currentBook === 'right' && rightLoaded)) {
-            getRandomQuote();
-        } else {
-            quoteTextDiv.innerHTML = '⚠️ 当前宝典未加载成功，请点击「重新加载」';
-            sourceBadge.innerHTML = '📚 书籍不可用';
-        }
-    });
+    randomBtn.addEventListener('click', getRandomQuote);
     reloadBtn.addEventListener('click', retryLoad);
 
-    // 初始化
     highlightSelected();
     loadBothBooks();
 </script>
